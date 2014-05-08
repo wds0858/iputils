@@ -214,15 +214,16 @@ $(TARGETS): %: %.o
 
 # -------------------------------------
 
-# arping
+# arping 库的设置
 DEF_arping = $(DEF_SYSFS) $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS)
 LIB_arping = $(LIB_SYSFS) $(LIB_CAP) $(LIB_IDN)
 
+#如果没有arping默认设备，则调用上面的库加载一个
 ifneq ($(ARPING_DEFAULT_DEVICE),)
 DEF_arping += -DDEFAULT_DEVICE=\"$(ARPING_DEFAULT_DEVICE)\"
 endif
 
-# clockdiff
+# clockdiff时间比对程序库设置
 DEF_clockdiff = $(DEF_CAP)
 LIB_clockdiff = $(LIB_CAP)
 
