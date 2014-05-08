@@ -1,18 +1,18 @@
-# Configuration
+#Configuration
 #
 
-# CC
+#CC
 #指定gcc程序
 CC=gcc
 
-# Path to parent kernel include files directory
+#Path to parent kernel include files directory
 #include头文件在内核的路径
 LIBC_INCLUDE=/usr/include
-# Libraries
+#Libraries
 #库
 ADDLIB=
 
-# Linker flags
+#Linker flags
 #Wl选项告诉编译器将后面的参数传递给链接器
 #-Wl,-Bstatic告诉链接器使用-Bstatic选项，该选项是告诉链接器，对接下来的-l选项使用静态链接
 #-Wl,-Bdynamic就是告诉链接器对接下来的-l选项使用动态链接
@@ -27,14 +27,14 @@ LDFLAG_RESOLV=-lresolv
 LDFLAG_SYSFS=-lsysfs
 
 #
-# Options
+#Options
 #
 #变量定义，设置开关
-# Capability support (with libcap) [yes|static|no]
+#Capability support (with libcap) [yes|static|no]
 #功能支持（与libcap的）[是|静态|否]
 USE_CAP=yes
 
-# sysfs support (with libsysfs - deprecated) [no|yes|static]
+#sysfs support (with libsysfs - deprecated) [no|yes|static]
 #sysfs的支持（与libsysfs - 不建议使用）[NO | YES|静态]
 USE_SYSFS=no
 
@@ -42,23 +42,23 @@ USE_SYSFS=no
 #IDN 支持（实验）[NO | YES|静态]
 USE_IDN=no
 
-# Do not use getifaddrs [no|yes|static]
+#Do not use getifaddrs [no|yes|static]
 #不使用getifaddrs[NO | YES|静态]
 WITHOUT_IFADDRS=no
 
-# arping default device (e.g. eth0) []
+#arping default device (e.g. eth0) []
 #arping的默认设备（如eth0的）[]
 ARPING_DEFAULT_DEVICE=
 
-# GNU TLS library for ping6 [yes|no|static]
+#GNU TLS library for ping6 [yes|no|static]
 #GNU TLS库ping6[是|否|静态]
 USE_GNUTLS=yes
 
-# Crypto library for ping6 [shared|static]
+#Crypto library for ping6 [shared|static]
 #ping6密码库的设置[共享|静态]
 USE_CRYPTO=shared
 
-# Resolv library for ping6 [yes|static]
+#Resolv library for ping6 [yes|static]
 #ping6 RESOLV库的设置[是|静态]
 USE_RESOLV=yes
 
@@ -66,7 +66,7 @@ USE_RESOLV=yes
 #ping6源路由（由RFC5095不建议使用）[NO | YES| RFC3542]
 ENABLE_PING6_RTHDR=no
 
-# rdisc server (-r option) support [no|yes]
+#rdisc server (-r option) support [no|yes]
 #磁盘服务器（-r选项）支持[NO | YES]
 ENABLE_RDISC_SERVER=no
 
@@ -106,7 +106,7 @@ endif
 #Resolv library for ping6 [yes|static]
 #ping6 RESOLV库的设置[是|静态]
 #USE_RESOLV=yes
-# USE_RESOLV: LIB_RESOLV
+#USE_RESOLV: LIB_RESOLV
 LIB_RESOLV = $(call FUNC_LIB,$(USE_RESOLV),$(LDFLAG_RESOLV))
 
 #Capability support (with libcap) [yes|static|no]
@@ -163,6 +163,7 @@ ifeq ($(ENABLE_PING6_RTHDR),RFC3542)
 endif
 endif
 
+#IP设置
 # -------------------------------------
 IPV4_TARGETS=tracepath ping clockdiff rdisc arping tftpd rarpd
 IPV6_TARGETS=tracepath6 traceroute6 ping6
@@ -175,14 +176,17 @@ TARGETS=$(IPV4_TARGETS) $(IPV6_TARGETS)
 CFLAGS=$(CCOPTOPT) $(CCOPT) $(GLIBCFIX) $(DEFINES)
 LDLIBS=$(LDLIB) $(ADDLIB)
 
+#显示节点名称
 UNAME_N:=$(shell uname -n)
 LASTTAG:=$(shell git describe HEAD | sed -e 's/-.*//')
+#按年月日显示当前日期时间
 TODAY=$(shell date +%Y/%m/%d)
 DATE=$(shell date --date $(TODAY) +%Y%m%d)
 TAG:=$(shell date --date=$(TODAY) +s%Y%m%d)
 
 
 # -------------------------------------
+#并不产生目标文件，其命令在每次make 该目标时才执行。
 .PHONY: all ninfod clean distclean man html check-kernel modules snapshot
 #IPV4_TARGETS=tracepath ping clockdiff rdisc arping tftpd rarpd
 #IPV6_TARGETS=tracepath6 traceroute6 ping6
@@ -194,7 +198,7 @@ all: $(TARGETS)
 	$(COMPILE.c) $< $(DEF_$(patsubst %.o,%,$@)) -o $@
 $(TARGETS): %: %.o
 	$(LINK.o) $^ $(LIB_$@) $(LDLIBS) -o $@
-#
+#  
 # COMPILE.c=$(CC) $(CFLAGS) $(CPPFLAGS) -c
 # $< 依赖目标中的第一个目标名字 
 # $@ 表示目标文件
@@ -209,6 +213,7 @@ $(TARGETS): %: %.o
 
 
 # -------------------------------------
+
 # arping
 DEF_arping = $(DEF_SYSFS) $(DEF_CAP) $(DEF_IDN) $(DEF_WITHOUT_IFADDRS)
 LIB_arping = $(LIB_SYSFS) $(LIB_CAP) $(LIB_IDN)
@@ -273,8 +278,10 @@ ninfod:
 		$(MAKE) -C ninfod
 
 # -------------------------------------
-# modules / check-kernel are only for ancient kernels; obsolete
+#仅为了过去内核的模块/内核检查;过时的内核检查：
+#modules / check-kernel are only for ancient kernels; obsolete
 check-kernel:
+#如果是内核头文件就执行输出的内容
 ifeq ($(KERNEL_INCLUDE),)
 	@echo "Please, set correct KERNEL_INCLUDE"; false
 else
@@ -282,7 +289,7 @@ else
 	if [ ! -r $(KERNEL_INCLUDE)/linux/autoconf.h ]; then \
 		echo "Please, set correct KERNEL_INCLUDE"; false; fi
 endif
-
+#内核检查模块
 modules: check-kernel
 	$(MAKE) KERNEL_INCLUDE=$(KERNEL_INCLUDE) -C Modules
 
