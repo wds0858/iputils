@@ -1,27 +1,3 @@
-#
-# Configuration
-#
-
-# CC
-#指定gcc程序
-CC=gcc
-
-# Path to parent kernel include files directory
-LIBC_INCLUDE=/usr/include
-# Libraries
-ADDLIB=
-
-# Linker flags
-#Wl选项告诉编译器将后面的参数传递给链接器
-#-Wl,-Bstatic告诉链接器使用-Bstatic选项，该选项是告诉链接器，对接下来的-l选项使用静态链接
-#-Wl,-Bdynamic就是告诉链接器对接下来的-l选项使用动态链接
-LDFLAG_STATIC=-Wl,-Bstatic
-LDFLAG_DYNAMIC=-Wl,-Bdynamic
-#指定加载库
-LDFLAG_CAP=-lcap
-LDFLAG_GNUTLS=-lgnutls-openssl
-LDFLAG_CRYPTO=-lcrypto
-LDFLAG_IDN=-lidn#
 # Configuration
 #
 
